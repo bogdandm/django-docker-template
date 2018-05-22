@@ -1,0 +1,97 @@
+version: '3.1'
+
+volumes:
+  redis-data:
+
+services:
+  nginx:
+    image: nginx:latest
+    restart: unless-stopped
+    volumes:
+      - ../:/opt/template_project
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./submodules/:/srv/submodules/
+    ports:
+      - "0.0.0.0:8000:80"
+    links:
+      - django
+    depends_on:
+      - django
+    command: /bin/bash -c '/opt/template_project/template_project_docker/run_nginx.sh'
+    container_name: template_project-nginx
+
+  django:
+    build:
+      context: ../
+      dockerfile: ./template_project_docker/Dockerfile
+    restart: unless-stopped
+    working_dir: /opt/template_project
+    volumes:
+      - ../:/opt/template_project
+    env_file:
+      - ../.env
+    links:
+      - db
+      - redis
+    depends_on:
+      - db
+      - redis
+    expose:
+      - 2021
+    command: /bin/bash -c '/opt/template_project/template_project_docker/run_django.sh'
+    container_name: template_project-django
+
+  worker:
+    build:
+      context: ../
+      dockerfile: ./template_project_docker/Dockerfile
+    restart: unless-stopped
+    working_dir: /opt/template_project
+    volumes:
+      - ../:/opt/template_project
+    env_file:
+      - ../.env
+    links:
+      - db
+      - redis
+    depends_on:
+      - db
+      - redis
+    command: /bin/bash -c '/opt/template_project/template_project_docker/run_celery.sh'
+    container_name: template_project-worker
+
+  beat:
+    build:
+      context: ../
+      dockerfile: ./template_project_docker/Dockerfile
+    restart: unless-stopped
+    working_dir: /opt/template_project
+    volumes:
+      - ../:/opt/template_project
+    env_file:
+      - ../.env
+    links:
+      - db
+      - redis
+    depends_on:
+      - db
+      - redis
+    command: /bin/bash -c '/opt/template_project/template_project_docker/run_celery.sh beat'
+    container_name: template_project-beat
+
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - ../pgdata:/var/lib/postgresql/data
+    env_file:
+      - ../.env
+    container_name: template_project-db
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    container_name: template_project-redis
