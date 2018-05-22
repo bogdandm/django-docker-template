@@ -21,5 +21,5 @@ else
     su -m root -c "../$VENV/bin/celery beat -f ../log/celery.log -A template_project.celery -s ../celerybeat-schedule --pidfile ../celerybeat.pid" # &
 fi
 
-# su -m root -c "../$VENV/bin/celery flower -A zg_book_project.celery --basic_auth=admin:qwerty12 > ../log/flower.log 2>&1" &
+# su -m root -c "../$VENV/bin/celery flower -A template_project.celery --basic_auth=admin:qwerty12 > ../log/flower.log 2>&1" &
 # fg %1

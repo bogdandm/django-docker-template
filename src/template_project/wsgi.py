@@ -1,5 +1,5 @@
 """
-WSGI config for zg_book_project project.
+WSGI config for template_project project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
