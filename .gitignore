@@ -23,3 +23,4 @@ redis/
 media/
 
 celerybeat-schedule
+.test/

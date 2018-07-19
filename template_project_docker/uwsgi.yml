@@ -1,5 +1,8 @@
 uwsgi:
   master: 1
+  worker: 4
+  threads: 2
+  enable-threads: 1
   socket: :2021
   # disable-logging: 1
   max-requests: 5000
